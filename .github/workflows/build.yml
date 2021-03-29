@@ -1,0 +1,25 @@
+name: 'build'
+on:
+  - 'push'
+  - 'pull_request'
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+    steps:
+      # Install golang
+      - name: Setup golang
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+
+      # Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Download and verify modules
+      - name: Initialize modules
+        run: 'go mod download; go mod verify'
+
+      # Build
+      - name: Build project
+        run: 'go build'

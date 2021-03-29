@@ -4,6 +4,7 @@ import (
 	"flag"
 	"github.com/docker/docker/client"
 	"github.com/gonvenience/bunt"
+	"github.com/lynxplay/carre/lib"
 	"log"
 	"os"
 	"os/signal"
@@ -23,12 +24,12 @@ func main() {
 		_, _ = bunt.Println("Red{-container is required!}")
 		return
 	}
-	mode, err := ParseOutputMode(*output)
+	mode, err := lib.ParseOutputMode(*output)
 	if err != nil {
 		_, _ = bunt.Printf("Orange{WARN: %s}\n", err)
 	}
 
-	context := DisplayContext{
+	context := lib.DisplayContext{
 		Name:       *container,
 		OutputMode: mode,
 	}
@@ -47,7 +48,7 @@ func main() {
 		case _ = <-signalBus:
 			return
 		case _ = <-timer.C:
-			DisplayCurrentStats(dockerClient, context)
+			lib.DisplayCurrentStats(dockerClient, context)
 		}
 	}
 }
