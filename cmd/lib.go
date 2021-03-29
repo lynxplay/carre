@@ -1,4 +1,4 @@
-package lib
+package cmd
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"github.com/docker/docker/client"
 	"log"
 	"strings"
+	"time"
 )
 
 var (
@@ -24,8 +25,8 @@ const (
 )
 
 type DisplayContext struct {
-	Name       string
-	OutputMode OutputMode
+	Name         string
+	OutputFormat OutputMode
 }
 
 func DisplayCurrentStats(dockerClient *client.Client, ctx DisplayContext) {
@@ -35,11 +36,12 @@ func DisplayCurrentStats(dockerClient *client.Client, ctx DisplayContext) {
 		return
 	}
 
-	switch ctx.OutputMode {
+	switch ctx.OutputFormat {
 	case JSON:
 		for i := range result.Processes {
 			process := result.Processes[i]
 			processValues := make(map[string]string)
+			processValues["TIMESTAMP"] = time.Now().String()
 			for j := range process {
 				processValues[result.Titles[j]] = process[j]
 			}
@@ -51,21 +53,23 @@ func DisplayCurrentStats(dockerClient *client.Client, ctx DisplayContext) {
 		}
 	case CSV:
 		if !PrintedCSVHeader {
-			fmt.Println(strings.Join(result.Titles, ","))
+			fmt.Println(strings.Join(result.Titles, ",") + ",TIMESTAMP") // Avoid slice reallocation for csv print
 			PrintedCSVHeader = true
 		}
 
 		for i := range result.Processes {
-			fmt.Println(strings.Join(result.Processes[i], ","))
+			fmt.Println(strings.Join(result.Processes[i], ",") + "," + time.Now().String())
 		}
 	}
 }
 
-func ParseOutputMode(str string) (OutputMode, error) {
+func ParseOutputFormat(str string) (OutputMode, error) {
 	switch strings.ToUpper(str) {
+	case "CSV":
+		return CSV, nil
 	case "JSON":
-		return JSON, nil
+		return JSON, nil // Different case than the default case, JSON was parsed correctly!
 	default:
-		return CSV, errors.New("failed to parse output mode; defaulting to CSV")
+		return JSON, errors.New("failed to parse output format; defaulting to JSON")
 	}
 }

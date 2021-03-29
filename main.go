@@ -1,54 +1,53 @@
 package main
 
 import (
-	"flag"
-	"github.com/docker/docker/client"
-	"github.com/gonvenience/bunt"
-	"github.com/lynxplay/carre/lib"
+	"github.com/lynxplay/carre/cmd"
+	"github.com/urfave/cli/v2"
 	"log"
 	"os"
-	"os/signal"
 	"time"
 )
 
-var (
-	container = flag.String("container", "", "-container <container_name>")
-	interval  = flag.Duration("interval", time.Millisecond*500, "-duration 10s")
-	output    = flag.String("output", "CSV", "-output CSV")
-)
+var version string
 
 func main() {
-	flag.Parse()
-	if "" == *container {
-		flag.Usage()
-		_, _ = bunt.Println("Red{-container is required!}")
-		return
+	app := &cli.App{
+		Name:    "carre",
+		Usage:   "Docker process data point collection",
+		Version: getVersion(),
+		Action:  cmd.Execute,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:     "container",
+				Aliases:  []string{"C"},
+				Usage:    "unique container name",
+				Required: true,
+			},
+			&cli.StringFlag{
+				Name:    "format",
+				Aliases: []string{"F"},
+				Value:   "JSON",
+				Usage:   "output format of caree",
+			},
+			&cli.DurationFlag{
+				Name:    "interval",
+				Aliases: []string{"I"},
+				Value:   500 * time.Millisecond,
+				Usage:   "interval between data point collection",
+			},
+		},
 	}
-	mode, err := lib.ParseOutputMode(*output)
+	app.EnableBashCompletion = true
+
+	err := app.Run(os.Args)
 	if err != nil {
-		_, _ = bunt.Printf("Orange{WARN: %s}\n", err)
+		log.Fatal(err)
 	}
+}
 
-	context := lib.DisplayContext{
-		Name:       *container,
-		OutputMode: mode,
+func getVersion() string {
+	if version == "" {
+		return "develop"
 	}
-
-	dockerClient, err := client.NewEnvClient()
-	if err != nil {
-		log.Fatalf("Failed to create environment dockerClient: %s", err)
-	}
-
-	signalBus := make(chan os.Signal, 1)
-	signal.Notify(signalBus, os.Interrupt, os.Kill)
-
-	timer := time.NewTicker(*interval)
-	for {
-		select {
-		case _ = <-signalBus:
-			return
-		case _ = <-timer.C:
-			lib.DisplayCurrentStats(dockerClient, context)
-		}
-	}
+	return version
 }

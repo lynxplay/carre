@@ -23,7 +23,7 @@ jobs:
 
       # Build
       - name: Build project
-        run: 'go build'
+        run: './scripts/build.sh'
 
       # Release binaries
       - name: Release
