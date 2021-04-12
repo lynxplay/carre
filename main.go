@@ -29,6 +29,12 @@ func main() {
 				Value:   "JSON",
 				Usage:   "output format of caree",
 			},
+			&cli.StringFlag{
+				Name:    "timestamp",
+				Aliases: []string{"T"},
+				Value:   "EPOCH",
+				Usage:   "output format of the timestamps carre generates",
+			},
 			&cli.DurationFlag{
 				Name:    "interval",
 				Aliases: []string{"I"},

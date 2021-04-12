@@ -11,10 +11,12 @@ import (
 
 func Execute(ctx *cli.Context) error {
 	outputFormat, err := ParseOutputFormat(ctx.String("format"))
+	timestampFormat, err := ParseTimestampFormat(ctx.String("timestamp"))
 
 	context := DisplayContext{
-		Name:         ctx.String("container"),
-		OutputFormat: outputFormat,
+		Name:            ctx.String("container"),
+		OutputFormat:    outputFormat,
+		TimestampFormat: timestampFormat,
 	}
 
 	dockerClient, err := client.NewEnvClient()

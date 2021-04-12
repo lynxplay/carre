@@ -28,12 +28,12 @@ on every system. The binaries can be found in the respective releases [here](htt
 
 ## Usage
 
-### -container (required)
+### --container | -C (required)
 
 The container parameter specifies the name of the container for which the metrics are to be gathered. It is required as
 this is the core point of caree,
 
-### -interval
+### --interval | -I
 
 The interval parameter can specify the duration between each data point collected by caree.
 
@@ -41,7 +41,7 @@ The interval parameter can specify the duration between each data point collecte
 
 #### Units: "ns", "us" (or "µs"), "ms", "s", "m", "h"
 
-### -format
+### --format | -F
 
 The format parameter specifies in which format the output is printed. As of right now the follow formats exist.
 
@@ -50,6 +50,18 @@ The format parameter specifies in which format the output is printed. As of righ
   complete json string.
 
 #### Default: JSON
+
+### --timestamp | -T
+
+The timestamp parameter specifies in which format the timestamp for each data point is going to be printed. As of right
+now the following formats exist.
+
+- 'ISO' specifies the time format to follow [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html), more
+  specifically [RFC3339](https://tools.ietf.org/html/rfc3339), when printing the timestamps.
+- 'EPOCH' specifies the timestamp to follow simple [unix epoch](https://en.wikipedia.org/wiki/Unix_time). The timestamp
+  will be represented as **milliseconds**.
+
+#### Default: EPOCH
 
 ------------------------------------------------------------------------------------------------------------------------
 
